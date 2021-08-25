@@ -36,7 +36,7 @@
       /* this is Main + required padding to meet 120px */
       padding-top: 80px;
     }
-  
+
     .mzp-c-call-out-title {
       margin-bottom: 12px;
     }
@@ -66,7 +66,6 @@
         class="mzp-c-call-out-desc"
         style="color: var(--color-marketing-gray-70);
   ">
-        This is a feasibility spike exploring a web-based Rally user experience.
       </p>
       <div style="padding: 2rem;">
         <button 
