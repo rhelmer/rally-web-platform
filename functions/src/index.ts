@@ -100,6 +100,46 @@ exports.addRallyUserToFirestore = functions.auth.user().onCreate(
     }
 );
 
+exports.deleteRallyUser = functions.auth.user().onDelete(
+  async (user) => {
+    functions.logger.info("deleteRallyUser fired");
+
+    // Delete the extension user document.
+    admin
+      .firestore()
+      .collection("extensionUsers")
+      .doc(user.uid)
+      .delete();
+
+    // Delete the user studies subcollection.
+    const collectionRef = admin
+      .firestore()
+      .collection("users")
+      .doc(user.uid)
+      .collection("studies");
+
+    // There will never be more of these than there are studies, which
+    // is why we're not worried about batching. If it does become a problem (over 500
+    // documents, per https://firebase.google.com/docs/firestore/manage-data/transactions),
+    // then see: https://firebase.google.com/docs/firestore/manage-data/delete-data#collections
+    //
+    // You might also consider: https://firebase.google.com/docs/firestore/solutions/delete-collections
+    const userStudyDocs = await collectionRef.get();
+    userStudyDocs.forEach(async (userStudyDoc) => {
+      await userStudyDoc.ref.delete();
+    });
+
+    // Finally, delete the user document.
+    admin
+      .firestore()
+      .collection("users")
+      .doc(user.uid)
+      .delete();
+
+    return true;
+  }
+);
+
 /**
  *
  * @param {string} index The firestore key.
